@@ -28,3 +28,5 @@ $ roslaunch kuka_kr4_description gazebo.launch
 
 ```
 ![text image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/fb694991-9abd-410d-b4e4-cf90c6787939/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20221113%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20221113T032357Z&X-Amz-Expires=86400&X-Amz-Signature=7d59d25fc21ea8c101468556007fc09bfd65a3fc7a0d76f01b3e13a13a8965ff&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
+
+![text image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/98f7de27-7806-4779-9375-d985d5bc400e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20221113%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20221113T035436Z&X-Amz-Expires=86400&X-Amz-Signature=75ed2d735e94769dd1eeab06e4e0cd34669e45749709b2c5d68cde31890f1d7b&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Untitled.png%22&x-id=GetObject)
