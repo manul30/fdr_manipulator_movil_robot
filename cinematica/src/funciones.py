@@ -31,9 +31,9 @@ def fkine_kuka_kr4(q):
     T1 = dh(0.330,q[0], 0, pi/2)
     T2 = dh(0, -q[1]+pi/2, 0.290, 0)
     T3 = dh(0, -q[2], 0.02, pi/2)
-    T4 = dh(0.310, q[3]+pi, 0, pi/2)
-    T5 = dh(0, q[4]+pi, 0, pi/2)
-    T6 = dh(0.075, q[5],0, 0)
+    T4 = dh(0.310, -q[3]+pi, 0, pi/2)
+    T5 = dh(0, -q[4]+pi, 0, pi/2)
+    T6 = dh(0.075, -q[5],0, 0)
     # Efector final con respecto a la base
     T = T1.dot(T2).dot(T3).dot(T4).dot(T5).dot(T6)
     return T
@@ -74,6 +74,10 @@ def ikine_kr4(xdes, q0):
     delta    = 0.00001
 
     q  = copy(q0)
+    
+    # Almacenamiento del error
+    ee = []
+    
     for i in range(max_iter):
         # Main loop
         J = jacobian_kr4(q)
@@ -84,10 +88,14 @@ def ikine_kr4(xdes, q0):
         # Actualización de q (método de Newton)
         q = q + np.dot(np.linalg.pinv(J), e)
         
+        # Norma del error
+        enorm = np.linalg.norm(e)
+        ee.append(enorm)    # Almacena los errores
+        
         # Condición de término
         if (np.linalg.norm(e) < epsilon):
             break
         #if (i==max_iter-1):
         #    print("El algoritmo no llegó al valor deseado")
     
-    return q
+    return q, ee
