@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="x" default="0.0" />
+    <arg name="y" default="0.0" />
+    <arg name="z" default="0.0" />
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+  <!--set to the required robot and world-->
+  <arg name="robotname" value="mpo_500"/>
+  <!--<arg name="robotworld" value="neobotix_env2.world"/>-->
+  <arg name="world_name_global" default="worlds/empty.world"/>
+
+  <!--To launch scanunifier set the value to true-->
+  <arg name="scanunifier" value="false"/>
+  <arg name="software_joystick" default="false"/>
+  <arg name="start_gazebo" default="true"/>
+
+<!---=================================================================================================================================================================-->
+
+  <!--Gazebo Variables-->
+  <arg name="world" default="empty"/>
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+<group if="$(arg start_gazebo)">
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!--<arg name="world_name" value="$(find neo_description)/worlds/$(arg robotworld)"/>-->
+    <arg name="world_name" value="$(arg world_name_global)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+</group>
+<!---=================================================================================================================================================================-->
+
+  <!--Robot description to param server-->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find integracion_kuka_omni)/robots/$(arg robotname)/$(arg robotname).urdf.xacro'"/>
+
+  <node name="$(arg robotname)_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+  args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description -model $(arg robotname) " />
+
+  <!--To publish Joint and Robot state-->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+	<param name="rate" value="20.0"/>
+  </node>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+	<param name="publish_frequency" value="20.0"/>
+  </node>
+
+
+<!---=================================================================================================================================================================-->
+
+ <node pkg="mpo_500_controller" type="KinematicsController.py" name="kinematics_controller"  output="screen">
+ </node>
+
+</launch>

@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<robot name="mpo_500" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--GAZEBO REFERENCES -->
+  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/mpo_500_gazebo.xacro" />
+
+  <!-- BODY -->
+  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/mpo_500_body.xacro" />
+  <xacro:include filename="$(find kuka_kr4_description)/urdf/kuka_kr4.xacro" />
+  <!-- WHEELS -->
+  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/omni_wheel.xacro" />
+
+  <!-- SENSORS --> 
+  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/sick_laser.xacro" />
+
+  <link name="dummy">
+   </link>
+
+  <joint name="dummy_joint" type="fixed">
+     <parent link="dummy"/>
+     <child link="base_link_omni"/>
+   </joint>
+
+  <!-- Base Macro-->
+  <xacro:mpo_500_base name="base_link_omni">
+  </xacro:mpo_500_base>
+
+
+  <xacro:kuka_kr4_agilus parent= "base_link_omni">
+     <origin xyz="0.0 0.0 0.386" rpy="0 0 0" />
+  </xacro:kuka_kr4_agilus>
+
+
+
+  <!-- Wheel Macro -->
+  <xacro:omni_wheel_250 name="wheel_front_left" parent="base_link_omni">
+  	<origin xyz="0.25 0.28 0.13" rpy="0 0 0" />
+  </xacro:omni_wheel_250>
+
+  <xacro:omni_wheel_250 name="wheel_front_right" parent="base_link_omni">
+  	<origin xyz="0.25 -0.28 0.13" rpy="0 0 0" />
+  </xacro:omni_wheel_250>
+
+  <xacro:omni_wheel_250 name="wheel_back_left" parent="base_link_omni">
+  	<origin xyz="-0.25 0.28 0.13" rpy="0 0 0" />
+  </xacro:omni_wheel_250>
+
+  <xacro:omni_wheel_250 name="wheel_back_right" parent="base_link_omni">
+  	<origin xyz="-0.25 -0.28 0.13" rpy="0 0 0" />
+  </xacro:omni_wheel_250>
+
+  <!-- Sensors -->
+  <xacro:sick_laser_v0 name="sick_laser_front" parent="base_link_omni" ros_topic="sick_front/scan">
+  	<origin xyz="0.442 0 0.372" rpy="0 0 0" />
+  </xacro:sick_laser_v0>
+
+  <xacro:sick_laser_v0 name="sick_laser_back" parent="base_link_omni" ros_topic="sick_back/scan">
+  	<origin xyz="-0.442 0 0.372" rpy="0 0 3.14" />
+  </xacro:sick_laser_v0>
+
+</robot>

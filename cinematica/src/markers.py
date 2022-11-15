@@ -1,3 +1,4 @@
+#!usr/bin/env python
 """
 Fundamentos de Robotica 2020-1 - UTEC
 Prof. Oscar E. Ramos

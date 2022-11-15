@@ -1,6 +1,6 @@
 <launch>
   <arg name="model" default="$(find kuka_kr4_description)/urdf/kuka_kr4.xacro"/>
-  <arg name="gui" default="true"/>
+  <arg name="gui" default="false"/>
   <arg name="rvizconfig" default="$(find kuka_kr4_description)/launch/urdf.rviz"/>
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
   <param name="use_gui" value="$(arg gui)"/>

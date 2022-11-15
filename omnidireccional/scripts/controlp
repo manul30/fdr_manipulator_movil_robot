@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+import rospy
+import numpy as np
+import math
+from nav_msgs.msg import Odometry # de rosotpic type /odom
+from geometry_msgs.msg import Twist
+
+global quaternion 
+global position 
+quaternion = [0,0,0,0]
+position = [0,0,0]
+
+
+def funcion(msg): # Tipo callback
+  position[0] = msg.pose.pose.position.x
+  position[1] = msg.pose.pose.position.y
+  position[2] = msg.pose.pose.position.z
+  quaternion[0] = msg.pose.pose.orientation.x
+  quaternion[1] = msg.pose.pose.orientation.y
+  quaternion[2] = msg.pose.pose.orientation.z
+  quaternion[3] = msg.pose.pose.orientation.w
+  #print(resultado)
+
+if __name__ == "__main__":
+
+  rospy.init_node('controlP')
+  rospy.Subscriber('odom', Odometry, funcion)
+  pub = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+
+  M = Twist()
+
+  x_desired = np.array([-5,0,np.pi/2*4])
+
+  data_act = open("/tmp/pose_act.txt","w")
+  data_des = open("/tmp/pose_des.txt","w")
+  rate = rospy.Rate(20)
+  while not rospy.is_shutdown():
+    # escalar
+    w = quaternion[3]
+    # vectores
+    ex = quaternion[0]
+    ey = quaternion[1]
+    ez = quaternion[2]
+    # almacenamiento de datos
+    R = np.array([[ 2*(w**2+ex**2)-1,    2*(ex*ey-w*ez),   2*(ex*ez+w*ey)],
+            [   2*(ex*ey+w*ez),  2*(w**2+ey**2)-1,   2*(ey*ez-w*ex)],
+            [   2*(ex*ez-w*ey),    2*(ey*ez+w*ex), 2*(w**2+ez**2)-1]])
+    ang = -math.atan2(R[0,1],R[0,0])
+    pose = np.array([position[0], position[1],ang])
+    
+    S = np.array([[np.cos(ang), -np.sin(ang), 0],
+                  [np.sin(ang), np.cos(ang), 0],
+                  [          0,           0, 1]])
+    """
+    S = np.array([[np.cos(ang),  0],
+                  [np.sin(ang),  0],
+                  [          0,  1]])
+    """
+    K = np.array([[ 0.5,   0,   0],
+                  [   0, 0.5,   0],
+                  [   0,   0, 0.5]])
+    S_inv = np.linalg.pinv(S)
+    e = np.array([x_desired[0]-position[0],
+            x_desired[1]-position[1],
+            x_desired[2]-ang])
+    inter = np.dot(K,e)
+    vel = np.dot(S_inv, inter)
+    M.linear.x = vel[0]
+    M.linear.y = vel[1]
+    M.angular.z = vel[2]
+    """
+    if M.linear.x >= 0.5:
+      M.linear.x = 0.5
+    if M.angular.z >= 0.5:
+      M.angular.z = 0.5
+    if M.linear.x <= -0.5:
+      M.linear.x = -0.5
+    if M.angular.z <= -0.5:
+      M.angular.z = -0.5
+    """
+
+    pub.publish(M)
+    rate.sleep()
+    if(np.linalg.norm(e)<0.05):
+      print('Control achieved')
+      M.linear.x = 0
+      M.linear.y = 0
+      M.angular.z = 0
+      pub.publish(M)
+      break
+    data_act.write(str(pose[0])+" "+str(pose[1])+" "+str(pose[2])+'\n')
+    data_des.write(str(x_desired[0])+" "+str(x_desired[1])+" "+str(x_desired[2])+'\n')
+  
+  data_act.close()
+  data_des.close()
+

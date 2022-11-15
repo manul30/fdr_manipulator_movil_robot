@@ -4,6 +4,16 @@
 <xacro:include filename="$(find kuka_kr4_description)/urdf/materials.xacro" />
 <xacro:include filename="$(find kuka_kr4_description)/urdf/kuka_kr4.trans" />
 <xacro:include filename="$(find kuka_kr4_description)/urdf/kuka_kr4.gazebo" />
+
+<xacro:macro name="kuka_kr4_agilus" params="parent *origin">
+
+  <joint name = "fixed_manipulator" type = "fixed">
+    <insert_block name="origin" />
+      <parent link="${parent}"/>
+     <child link="base_link"/>
+    
+  </joint>
+
 <link name="base_link">
   <inertial>
     <origin xyz="-0.03685052519874798 0.0002444650496217044 0.09028031393493556" rpy="0 0 0"/>
@@ -192,5 +202,5 @@
   <child link="efector_final_1"/>
   <axis xyz="-1.0 0.0 -0.0"/>
 </joint>
-
+</xacro:macro>
 </robot>
