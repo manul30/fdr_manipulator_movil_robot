@@ -1,0 +1,206 @@
+<?xml version="1.0" ?>
+<robot name="kuka_kr4" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find integracion_kuka_omni)/urdf/materials.xacro" />
+<xacro:include filename="$(find integracion_kuka_omni)/urdf/kuka_kr4.trans" />
+<xacro:include filename="$(find integracion_kuka_omni)/urdf/kuka_kr4.gazebo" />
+
+<xacro:macro name="kuka_kr4_agilus" params="parent *origin">
+
+  <joint name = "fixed_manipulator" type = "fixed">
+    <insert_block name="origin" />
+      <parent link="${parent}"/>
+     <child link="base_link"/>
+    
+  </joint>
+
+<link name="base_link">
+  <inertial>
+    <origin xyz="-0.03685052519874798 0.0002444650496217044 0.09028031393493556" rpy="0 0 0"/>
+    <mass value="52.09763807147974"/>
+    <inertia ixx="0.237109" iyy="0.389106" izz="0.374461" ixy="0.002106" iyz="0.000599" ixz="0.003044"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="arm_1_1">
+  <inertial>
+    <origin xyz="-0.003988136239754784 -0.0007020266635606675 0.08231492151934183" rpy="0 0 0"/>
+    <mass value="27.389571489728127"/>
+    <inertia ixx="0.228578" iyy="0.147549" izz="0.163411" ixy="0.000127" iyz="0.001416" ixz="-0.000588"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0 0.0 -0.177" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.0 0.0 -0.177" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="arm_2_1">
+  <inertial>
+    <origin xyz="-0.010662422573048202 -0.06312208973151316 0.11773443401249284" rpy="0 0 0"/>
+    <mass value="37.16046001565583"/>
+    <inertia ixx="0.491976" iyy="0.430396" izz="0.134175" ixy="-2.1e-05" iyz="0.004479" ixz="0.007959"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0 -0.064 -0.3292" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.0 -0.064 -0.3292" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://kuka_kr4_description/meshes/arm_2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="arm_3_1">
+  <inertial>
+    <origin xyz="0.05016463351790332 -0.06115462726961939 0.009515195828368905" rpy="0 0 0"/>
+    <mass value="16.81095567354773"/>
+    <inertia ixx="0.027845" iyy="0.081909" izz="0.078872" ixy="0.000717" iyz="0.000107" ixz="-0.008555"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0 -0.062 -0.6192" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.0 -0.062 -0.6192" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="arm_4_1">
+  <inertial>
+    <origin xyz="0.07072783604162342 0.002541906720189751 0.0014460342528421766" rpy="0 0 0"/>
+    <mass value="8.604519243549056"/>
+    <inertia ixx="0.018169" iyy="0.020163" izz="0.028764" ixy="-0.002064" iyz="-0.000351" ixz="0.000211"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.1632 0.0 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.1632 0.0 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="arm_5_1">
+  <inertial>
+    <origin xyz="0.0031397968802750476 -0.04852169254529081 -1.247668779158495e-05" rpy="0 0 0"/>
+    <mass value="4.272813571114689"/>
+    <inertia ixx="0.003752" iyy="0.005073" izz="0.005384" ixy="-4.2e-05" iyz="1e-06" ixz="-1e-05"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.31 -0.049 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_5_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.31 -0.049 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/arm_5_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="efector_final_1">
+  <inertial>
+    <origin xyz="0.014533865884605035 -2.541966860416472e-06 -2.4161364704511357e-06" rpy="0 0 0"/>
+    <mass value="0.26603789816689666"/>
+    <inertia ixx="7.4e-05" iyy="4.8e-05" izz="4.8e-05" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.358 0.0 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/efector_final_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.358 0.0 -0.6392" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://integracion_kuka_omni/meshes/efector_final_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="Revolucion1" type="continuous">
+  <origin xyz="0.0 0.0 0.177" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="arm_1_1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+</joint>
+
+<joint name="Revolucion2" type="continuous">
+  <origin xyz="0.0 0.064 0.1522" rpy="0 0 0"/>
+  <parent link="arm_1_1"/>
+  <child link="arm_2_1"/>
+  <axis xyz="-0.0 1.0 0.0"/>
+</joint>
+
+<joint name="Revolucion3" type="continuous">
+  <origin xyz="0.0 -0.002 0.29" rpy="0 0 0"/>
+  <parent link="arm_2_1"/>
+  <child link="arm_3_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="Revolucion4" type="continuous">
+  <origin xyz="0.1632 -0.062 0.02" rpy="0 0 0"/>
+  <parent link="arm_3_1"/>
+  <child link="arm_4_1"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
+</joint>
+
+<joint name="Revolucion5" type="continuous">
+  <origin xyz="0.1468 0.049 0.0" rpy="0 0 0"/>
+  <parent link="arm_4_1"/>
+  <child link="arm_5_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="Revolucion6" type="continuous">
+  <origin xyz="0.048 -0.049 0.0" rpy="0 0 0"/>
+  <parent link="arm_5_1"/>
+  <child link="efector_final_1"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
+</joint>
+</xacro:macro>
+</robot>

@@ -1,6 +1,21 @@
 <launch>
+  <arg name="x" default="1.0" />
+  <arg name="y" default="0.0" />
+  <arg name="z" default="0.0" />
+  <arg name="roll" default="0.0"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+  <arg name="robotname" value="mpo_500"/>
+  <param name="robot_description2" command="$(find xacro)/xacro.py '$(find neo_description)/robots/$(arg robotname)/$(arg robotname).urdf.xacro'"/>
+
+
   <param name="robot_description" command="$(find xacro)/xacro $(find kuka_kr4_description)/urdf/kuka_kr4.xacro"/>
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model kuka_kr4"/>
+  <node name="$(arg robotname)_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+  args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -param robot_description2 -model $(arg robotname) " />
+
+
+
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="paused" value="true"/>
     <arg name="use_sim_time" value="true"/>
@@ -8,4 +23,5 @@
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
+
 </launch>
