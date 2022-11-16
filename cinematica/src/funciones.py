@@ -87,17 +87,17 @@ def ikine_kr4(xdes, q0):
         f = f[0:3,3]
         # Error
         e = xdes-f
-        # Actualización de q (método de Newton)
+        # Actualizacion de q (metodo de Newton)
         q = q + np.dot(np.linalg.pinv(J), e)
         
         # Norma del error
         enorm = np.linalg.norm(e)
         ee.append(enorm)    # Almacena los errores
         
-        # Condición de término
+        # Condicion de termino
         if (np.linalg.norm(e) < epsilon):
             break
         #if (i==max_iter-1):
-        #    print("El algoritmo no llegó al valor deseado")
+        #    print("El algoritmo no llego al valor deseado")
     
     return q, ee
