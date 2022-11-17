@@ -10,6 +10,8 @@ global position
 quaternion = [0,0,0,0]
 position = [0,0,0]
 
+max_vel = 1
+
 
 def funcion(msg): # Tipo callback
   position[0] = msg.pose.pose.position.x
@@ -29,7 +31,7 @@ if __name__ == "__main__":
 
   M = Twist()
 
-  x_desired = np.array([-5,0,np.pi/2*4])
+  x_desired = np.array([0,0,np.pi/2*1])
 
   data_act = open("/tmp/pose_act.txt","w")
   data_des = open("/tmp/pose_des.txt","w")
@@ -68,16 +70,20 @@ if __name__ == "__main__":
     M.linear.x = vel[0]
     M.linear.y = vel[1]
     M.angular.z = vel[2]
-    """
-    if M.linear.x >= 0.5:
-      M.linear.x = 0.5
-    if M.angular.z >= 0.5:
-      M.angular.z = 0.5
-    if M.linear.x <= -0.5:
-      M.linear.x = -0.5
-    if M.angular.z <= -0.5:
-      M.angular.z = -0.5
-    """
+    
+    if M.linear.x >= max_vel:
+      M.linear.x = max_vel
+    if M.linear.y >= max_vel:
+      M.linear.y = max_vel
+    if M.angular.z >= max_vel:
+      M.angular.z = max_vel
+    if M.linear.x <= -max_vel:
+      M.linear.x = -max_vel
+    if M.linear.y <= -max_vel:
+      M.linear.y = -max_vel
+    if M.angular.z <= -max_vel:
+      M.angular.z = -max_vel
+    
 
     pub.publish(M)
     rate.sleep()

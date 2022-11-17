@@ -2,16 +2,17 @@
 <robot name="mpo_500" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!--GAZEBO REFERENCES -->
-  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/mpo_500_gazebo.xacro" />
+  <xacro:include filename="$(find integracion_kuka_omni)/robots/mpo_500/xacros/mpo_500_gazebo.xacro" />
 
   <!-- BODY -->
-  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/mpo_500_body.xacro" />
-  <xacro:include filename="$(find kuka_kr4_description)/urdf/kuka_kr4.xacro" />
+  <xacro:include filename="$(find integracion_kuka_omni)/robots/mpo_500/xacros/mpo_500_body.xacro" />
+  <xacro:include filename="$(find kuka_kr4_description)/urdf/kuka_kr4_macro.xacro" />
   <!-- WHEELS -->
-  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/omni_wheel.xacro" />
+  <xacro:include filename="$(find integracion_kuka_omni)/robots/mpo_500/xacros/omni_wheel.xacro" />
 
   <!-- SENSORS --> 
-  <xacro:include filename="$(find neo_description)/robots/mpo_500/xacros/sick_laser.xacro" />
+  <xacro:include filename="$(find integracion_kuka_omni)/robots/mpo_500/xacros/sick_laser.xacro" />
+
 
   <link name="dummy">
    </link>
@@ -20,6 +21,7 @@
      <parent link="dummy"/>
      <child link="base_link_omni"/>
    </joint>
+
 
   <!-- Base Macro-->
   <xacro:mpo_500_base name="base_link_omni">
