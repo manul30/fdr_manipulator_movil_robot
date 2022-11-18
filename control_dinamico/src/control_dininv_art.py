@@ -30,12 +30,19 @@ jstate.name = jnames
 
 # =============================================================
 # Configuracion articular inicial (en radianes)
-q = np.array([0.1, -0.1, 0, 0.2, 0.6, 0.0])
+q = np.array([0.0, -1.0, 1.0, 1.2, -1.6, 0.0])
 # Velocidad inicial
 dq = np.array([0., 0., 0., 0., 0., 0.])
+# Aceleracion inicial
+ddq = np.array([0., 0., 0., 0., 0., 0.])
 # Configuracion articular deseada
-qdes = np.array([0.2, 0.0, -0.3, 0.3, 0.5, -0.1])
-# ===========================
+qdes = np.array([1.0, 0.0, -0.3, 0.3, 0.5, -0.1])
+# Velocidad articular deseada
+dqdes = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+# Aceleracion articular deseada
+ddqdes = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+ddxdes=np.array([ 0.0, 0.0, 0.0])
+# =============================================================
 
 # Posicion resultante de la configuracion articular deseada
 xdes = fkine_kuka_kr4(qdes)[0:3,3]
@@ -60,9 +67,11 @@ robot = Robot(q, dq, ndof, dt)
 t = 0.0
 
 # Se definen las ganancias del controlador
-valores = 0.001*np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+valores = 0.3*np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 Kp = np.diag(valores)
 Kd = 2*np.sqrt(Kp)
+
+# Inicializar variables
 
 while not rospy.is_shutdown():
 
@@ -74,6 +83,7 @@ while not rospy.is_shutdown():
     # Tiempo actual (necesario como indicador para ROS)
     jstate.header.stamp = rospy.Time.now()
     
+    print(q)
     # Almacenamiento de datos
     fxact.write(str(t)+' '+str(x[0])+' '+str(x[1])+' '+str(x[2])+'\n')
     fxdes.write(str(t)+' '+str(xdes[0])+' '+str(xdes[1])+' '+str(xdes[2])+'\n')
@@ -84,20 +94,30 @@ while not rospy.is_shutdown():
     # Control dinamico (COMPLETAR)
     # ----------------------------
     # Arrays numpy
-    u = np.zeros(ndof)   # incializamos la matriz con zeros
-    
     zeros = np.zeros(ndof) # Vector de ceros
-    gravity = np.zeros(ndof) # Peso debido a la gravedad incializada
-    rbdl.InverseDynamics(modelo, q, zeros, zeros, gravity) #rbdl
-    u =gravity+Kp.dot(qdes - q) - Kd.dot(dq) # Calculo de tau
-    unos= np.ones(ndof)
-    # for n in range(6):
-    #     if(u[n]>0.1):u[n]=0.1
-    #     if(u[n]<-0.1):u[n]=-0.1
-    #     else:u[n]=u[n]
-    print('u: ',u)
-    print('q: ',q)
-    print('dq: ',dq)
+    tau = np.zeros(ndof) # Para torque
+    g = np.zeros(ndof) # Para la gravedad
+    c = np.zeros(ndof) # Para el vector de Coriolis+centrifuga
+    M = np.zeros([ndof, ndof]) # Para la matriz de inercia
+    e = np.eye(6) # Vector identidad
+    # Calculo de torque
+    rbdl.InverseDynamics(modelo, q, dq, ddq, tau)
+    # Calculo de fuerzas por gravedad
+    rbdl.InverseDynamics(modelo, q, zeros, zeros, g)
+    # Calculo de coriolis y centrifuga
+    rbdl.InverseDynamics(modelo, q, dq, zeros, c)
+    c = c - g
+    # Calculo matriz de inercia
+    for i in range(ndof):
+        rbdl.InverseDynamics(modelo, q, zeros, e[i,:], M[i,:])
+        M[i,:] = M[i,:] - g
+    # Dinamica de error de segundo orden
+  
+    # Calculo del torque
+    #print(u)
+    u = M.dot(ddqdes + Kd.dot(dqdes-dq) + Kp.dot(qdes-q)) + c + g
+    
+
     
 
     # Simulacion del robot
