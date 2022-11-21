@@ -1,9 +1,3 @@
-#!usr/bin/env python3
-"""
-Fundamentos de Robotica 2020-1 - UTEC
-Prof. Oscar E. Ramos
-File: markers.py
-"""
 
 from visualization_msgs.msg import Marker
 import numpy as np
@@ -13,6 +7,7 @@ import rospy
 class BallMarker(object):
     """
     Class to visualize ball markers in RViz
+
     """
     id = 0
 
@@ -21,8 +16,9 @@ class BallMarker(object):
         The color can be specified as a list with 3 elements or as the color
         dictionary (e.g. BLUE, RED, etc). Alpha sets the transparency and scale
         scales the size of the ball
+
         """
-        reference_frame = rospy.get_param('reference_frame','base')
+        reference_frame = rospy.get_param('reference_frame','base_link')
         self.marker_pub = rospy.Publisher("visualization_marker", Marker,
                                           queue_size=10)
         self.marker = Marker()
@@ -54,6 +50,7 @@ class BallMarker(object):
     def position(self, T):
         """
         Set position (4x4 NumPy homogeneous matrix) for the ball and publish it
+
         """
         self.marker.pose.position.x = T[0,3]
         self.marker.pose.position.y = T[1,3]
@@ -63,6 +60,7 @@ class BallMarker(object):
     def xyz(self, position):
         """
         Set position (list) for the ball and publish it
+
         """
         self.marker.pose.position.x = position[0]
         self.marker.pose.position.y = position[1]
@@ -77,6 +75,7 @@ class BallMarker(object):
 
 """
 List for colors in BallMarker
+
 """
 color = dict()
 color['RED']       = (1.0, 0.0, 0.0)
@@ -95,6 +94,7 @@ color['WHITE']     = (1.0, 1.0, 1.0)
 class FrameMarker(object):
     """
     Class to visualize frames as markers in RViz
+
     """
     id = 0
 
@@ -102,8 +102,9 @@ class FrameMarker(object):
         """
         The color saturation ranges from 0 to 1. Alpha sets the transparency
         and scale scales the size of the ball
+
         """
-        reference_frame = rospy.get_param('reference_frame','/map')
+        reference_frame = rospy.get_param('reference_frame','base_link')
         self.marker_pub = rospy.Publisher("visualization_marker", Marker,
                                           queue_size=10)
         self.markerx = Marker()
@@ -174,38 +175,40 @@ class FrameMarker(object):
         """
         Set the pose (7x1 NumPy matrix) for the ball and publish it. If only
         position is passed, a canonical orientation is used.
+
         """
-        self.markerx.pose.position.x = pose[0][0]
-        self.markerx.pose.position.y = pose[1][0]
-        self.markerx.pose.position.z = pose[2][0]
-        self.markery.pose.position.x = pose[0][0]
-        self.markery.pose.position.y = pose[1][0]
-        self.markery.pose.position.z = pose[2][0]
-        self.markerz.pose.position.x = pose[0][0]
-        self.markerz.pose.position.y = pose[1][0]
-        self.markerz.pose.position.z = pose[2][0]
+        self.markerx.pose.position.x = pose[0]
+        self.markerx.pose.position.y = pose[1]
+        self.markerx.pose.position.z = pose[2]
+        self.markery.pose.position.x = pose[0]
+        self.markery.pose.position.y = pose[1]
+        self.markery.pose.position.z = pose[2]
+        self.markerz.pose.position.x = pose[0]
+        self.markerz.pose.position.y = pose[1]
+        self.markerz.pose.position.z = pose[2]
         if (len(pose)==7):
             # X is aligned and has no rotation
-            self.markerx.pose.orientation.w = pose[3][0]
-            self.markerx.pose.orientation.x = pose[4][0]
-            self.markerx.pose.orientation.y = pose[5][0]
-            self.markerx.pose.orientation.z = pose[6][0]
+            self.markerx.pose.orientation.w = pose[3]
+            self.markerx.pose.orientation.x = pose[4]
+            self.markerx.pose.orientation.y = pose[5]
+            self.markerx.pose.orientation.z = pose[6]
 
             # Y is rotated 90 wrt current Z
-            q1 = np.matrix([[np.cos(np.pi/4.0)],[0.],[0.],[np.sin(np.pi/4.0)]])
-            q = quaternionMult(pose[np.ix_([3,4,5,6])],q1)
-            self.markery.pose.orientation.w = q[0][0]
-            self.markery.pose.orientation.x = q[1][0]
-            self.markery.pose.orientation.y = q[2][0]
-            self.markery.pose.orientation.z = q[3][0]
+            q1 = np.array([np.cos(np.pi/4.0),0.,0.,np.sin(np.pi/4.0)])
+            #q = quaternionMult(pose[np.ix_([3,4,5,6])],q1)
+            q = quaternionMult(pose[3:],q1)
+            self.markery.pose.orientation.w = q[0]
+            self.markery.pose.orientation.x = q[1]
+            self.markery.pose.orientation.y = q[2]
+            self.markery.pose.orientation.z = q[3]
 
             # Z is rotated -90 wrt current Y
-            q1 = np.matrix([[np.cos(-np.pi/4.0)],[0.],[np.sin(-np.pi/4.0)],[0.]])
-            q = quaternionMult(pose[np.ix_([3,4,5,6])],q1)
-            self.markerz.pose.orientation.w = q[0][0]
-            self.markerz.pose.orientation.x = q[1][0]
-            self.markerz.pose.orientation.y = q[2][0]
-            self.markerz.pose.orientation.z = q[3][0]
+            q1 = np.array([np.cos(-np.pi/4.0),0.,np.sin(-np.pi/4.0),0.])
+            q = quaternionMult(pose[3:],q1)
+            self.markerz.pose.orientation.w = q[0]
+            self.markerz.pose.orientation.x = q[1]
+            self.markerz.pose.orientation.y = q[2]
+            self.markerz.pose.orientation.z = q[3]
 
         self.publish()
 
@@ -217,11 +220,11 @@ class FrameMarker(object):
 
 def quaternionMult(q1, q2):
     quat = 4*[0.,]
-    quat[0] = -q1[1,0]*q2[1,0]-q1[2,0]*q2[2,0]-q1[3,0]*q2[3,0]+q1[0,0]*q2[0,0]
-    quat[1] =  q1[0,0]*q2[1,0]-q1[3,0]*q2[2,0]+q1[2,0]*q2[3,0]+q1[1,0]*q2[0,0]
-    quat[2] =  q1[3,0]*q2[1,0]+q1[0,0]*q2[2,0]-q1[1,0]*q2[3,0]+q1[2,0]*q2[0,0]
-    quat[3] = -q1[2,0]*q2[1,0]+q1[1,0]*q2[2,0]+q1[0,0]*q2[3,0]+q1[3,0]*q2[0,0]
-    return np.matrix([quat]).transpose()
+    quat[0] = -q1[1]*q2[1]-q1[2]*q2[2]-q1[3]*q2[3]+q1[0]*q2[0]
+    quat[1] =  q1[0]*q2[1]-q1[3]*q2[2]+q1[2]*q2[3]+q1[1]*q2[0]
+    quat[2] =  q1[3]*q2[1]+q1[0]*q2[2]-q1[1]*q2[3]+q1[2]*q2[0]
+    quat[3] = -q1[2]*q2[1]+q1[1]*q2[2]+q1[0]*q2[3]+q1[3]*q2[0]
+    return np.array(quat)
 
 
 def vtotuple(v):

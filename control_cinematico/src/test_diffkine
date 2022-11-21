@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+from __future__ import print_function
+import rospy
+from sensor_msgs.msg import JointState
+
+from markers import *
+from funciones import *
+
+
+# Initialize the node
+rospy.init_node("testKineControlPosition")
+print('starting motion ... ')
+# Publisher: publish to the joint_states topic
+pub = rospy.Publisher('joint_states', JointState, queue_size=10)
+# Files for the logs
+fxcurrent = open("/tmp/xcurrent.txt", "w")                
+fxdesired = open("/tmp/xdesired.txt", "w")
+fq = open("/tmp/q.txt", "w")
+
+# Markers for the current and desired positions
+bmarker_current  = BallMarker(color['RED'])
+bmarker_desired = BallMarker(color['GREEN'])
+
+# Joint names
+jnames = ['Revolucion1', 'Revolucion2', 'Revolucion3','Revolucion4', 'Revolucion5', 'Revolucion6']
+
+
+# Desired position
+xd = np.array([0.54, 0.125, 0.2491])
+#xd = np.array([0.3, 0.5, -0.2])
+# Initial configuration
+q0  = np.array([0.0, -1.0, 1.7, -2.2, -1.6, 0.0])
+
+# Resulting initial position (end effector with respect to the base link)
+T = fkine_kuka_kr4(q0)
+x0 = T[0:3,3]
+
+# Red marker shows the achieved position
+bmarker_current.xyz(x0)
+# Green marker shows the desired position
+bmarker_desired.xyz(xd)
+
+# Instance of the JointState message
+jstate = JointState()
+# Values of the message
+jstate.header.stamp = rospy.Time.now()
+jstate.name = jnames
+# Add the head joint value (with value 0) to the joints
+jstate.position = q0
+
+# Frequency (in Hz) and control period 
+freq = 200
+dt = 1.0/freq
+rate = rospy.Rate(freq)
+
+# Initial joint configuration
+q = copy(q0)
+
+# Definicion de la constante de proporcionalidad
+k = 1
+
+# Main loop
+while not rospy.is_shutdown():
+    # Current time (needed for ROS)
+    jstate.header.stamp = rospy.Time.now()
+    # Kinematic control law for position (complete here)
+    # -----------------------------
+
+    T = fkine_kuka_kr4(q)     # Uso de la funcion de cinematica directa 
+    x = T[0:3,3]     # Vector de posicion
+    e = x - xd       # Pos Inicial - Pos Final
+    ep = -k*e        # Ley de Control
+    J = jacobian_kr4(q, delta=0.0001) # Calculo del Jacobiano
+    qp = np.linalg.pinv(J).dot(ep)         # Pseudo-Inversa Moore-Penrose
+    q = q + dt * qp                        # Integracion de Euler
+    # -----------------------------
+
+    
+    # Log values                                                      
+    fxcurrent.write(str(x[0])+' '+str(x[1]) +' '+str(x[2])+'\n')
+    fxdesired.write(str(xd[0])+' '+str(xd[1])+' '+str(xd[2])+'\n')
+    fq.write(str(q[0])+" "+str(q[1])+" "+str(q[2])+" "+str(q[3])+" "+
+             str(q[4])+" "+str(q[5])+"\n")
+    
+    # Publish the message
+    jstate.position = q
+    pub.publish(jstate)
+    bmarker_desired.xyz(xd)
+    bmarker_current.xyz(x)
+    # Wait for the next iteration
+    rate.sleep()
+
+print('ending motion ...')
+fxcurrent.close()
+fxdesired.close()
+fq.close()

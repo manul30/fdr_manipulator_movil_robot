@@ -13,7 +13,7 @@ bmarker = BallMarker(color['GREEN'])
 # Joint names
 jnames = ['Revolucion1', 'Revolucion2', 'Revolucion3','Revolucion4', 'Revolucion5', 'Revolucion6']
 # Joint Configuration
-q = [0.9, 0.8, 0.5, -1.3, -0.4, 0.4]
+q = [1.2, 0, 0, 0, 0, 1.2]
 
 # End effector with respect to the base
 T = fkine_kuka_kr4(q)

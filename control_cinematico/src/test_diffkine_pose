@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+#
+
+from __future__ import print_function
+import rospy
+from sensor_msgs.msg import JointState
+
+from markers import *
+from funciones import *
+
+
+# Initialize the node
+rospy.init_node("testKineControlPose")
+print('starting motion ... ')
+# Publisher: publish to the joint_states topic
+pub = rospy.Publisher('joint_states', JointState, queue_size=1000)
+# Markers for the current and desired positions
+# Markers for the current and desired positions
+# bmarker_current  = BallMarker(color['RED'])
+# bmarker_desired = BallMarker(color['GREEN'])
+bmarker_current  = FrameMarker()
+bmarker_desired = FrameMarker(0.5)
+
+# Joint names
+jnames = ['Revolucion1', 'Revolucion2', 'Revolucion3',
+          'Revolucion4', 'Revolucion5', 'Revolucion6']
+
+# Desired pose
+ang = pi/3
+Rd = np.array([[0,1,0],[1,0,0],[0,0,-1]])
+qd = rot2quat(Rd)
+# Find an xd that the robot can reach
+xd = np.array([0.2, 0.250, 0.6, qd[0], qd[1], qd[2], qd[3]])
+#xd  = np.array([0.5, 0.5, 0.6, np.cos(ang/2.0), 0, 0, np.sin(ang/2.0)])
+# Initial configuration
+q0  = np.array([0.2, 0.0, 0.3, 0.2, 0.1, 0.0])
+
+# Resulting initial pose (end effector with respect to the base link)
+T = fkine_kuka_kr4(q0)
+x0 = TF2xyzquat(T)
+
+# Markers for the current and the desired pose
+bmarker_current.setPose(x0)
+bmarker_desired.setPose(xd)
+
+# Instance of the JointState message
+jstate = JointState()
+# Values of the message
+jstate.header.stamp = rospy.Time.now()
+jstate.name = jnames
+# Add the head joint value (with value 0) to the joints
+jstate.position = q0
+
+# Frequency (in Hz) and control period 
+freq = 200
+dt = 1.0/freq
+rate = rospy.Rate(freq)
+
+# Initial joint configuration
+q = copy(q0)
+x = copy(x0)
+quat = x[3:7]
+# Initialize the derror vector (derivative of the error)
+derror = np.zeros(7)
+# Main loop
+k=0.5
+#for i in range(1):
+while not rospy.is_shutdown():
+    # Current time (needed for ROS)
+    jstate.header.stamp = rospy.Time.now()
+    # Kinematic control law for the pose (complete here)
+    # --------------------------------------------------
+
+    J = jacobian_pose(q)
+    invJ = np.linalg.pinv(J)
+    w = quat[0]
+    e = quat[1:4]
+    wd = qd[0]
+    ed = qd[1:4]
+    # error del cuaternión
+    we = wd*w + ed.T.dot(e)
+    ee = -wd*e + w*ed - skew(ed).dot(e)
+    # error pose: de la posición y orientación
+    e = np.hstack([x[0:3]-xd[0:3],we-1, ee])
+    # ley control del error
+    derror = -k*e
+    dq = invJ.dot(derror) # diferencial de las integra
+    q = q + dt*dq # integral de las velocidades de las posciones de las articulaciones
+    # Verificación de posiciones articulares
+    if(q[0]<-6.28): q[0]=-6.28
+    elif(q[0]>6.28): q[0]=6.28
+    if(q[1]<-6.28): q[1]=-6.28
+    elif(q[1]>6.28): q[1]=6.28
+    if(q[2]<-3.14): q[2]=-3.14
+    elif(q[2]>3.14): q[2]=3.14
+    if(q[3]<-6.28): q[3]=-6.28
+    elif(q[3]>6.28): q[3]=6.28
+    if(q[4]<-6.28): q[4]=-6.28
+    elif(q[4]>6.28): q[4]=6.28
+    if(q[5]<-6.28): q[5]=-6.28
+    elif(q[5]>6.28): q[5]=6.28
+    # Current configuration trnaformation to current position
+    T = fkine_kuka_kr4(q)
+    x = TF2xyzquat(T)
+    
+    # Publish the message
+    jstate.position = q
+    pub.publish(jstate)
+    bmarker_desired.setPose(xd)
+    bmarker_current.setPose(x)
+    # Wait for the next iteration
+    rate.sleep()
